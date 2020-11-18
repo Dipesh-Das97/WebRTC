@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+    <div id="containers">
+        <div id="meters">
+            <div id="instant">
+                <div class="label">Instant:</div>
+                <meter max="1" value="0"></meter>
+                <div class="value"></div>
+            </div>
+            <div id="slow">
+                <div class="label">Slow:</div>
+                <meter max="1" value="0"></meter>
+                <div class="value"></div>
+            </div>
+        </div>
+        <div>
+            <button type="button" id="startButton">Start</button>
+            <button type="button" id="stopButton" disabled>Stop</button>
+        </div>
+        <div id="errorMsg"></div>
+    </div>
+    <script src="getAudioOnly.js"></script>
+</body>
+
+</html>
