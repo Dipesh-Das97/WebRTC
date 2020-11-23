@@ -47,6 +47,7 @@ function attachSinkId(element, sinkId) {
             })
             .catch(error => {
                 console.error(errorMessage);
+                audioOutputSelect.selectedIndex = 0;
             });
     }
 }
