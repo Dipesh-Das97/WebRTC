@@ -6,12 +6,17 @@ const selectors = [audioInputSelect, audioOutputSelect, videoSelect];
 
 function gotDevices(deviceInfos) {
     // Handles being called several times to update labels. Preserve values.
-    const values = selectors.map(select => select.value);
+    const values = selectors.map(select => select.value);//are the options available in each label i.e. deviceID
+    //for everytime we need to refresh these labels and hence we need to delete the elements 
+    //from each of these labels to be able to add these values again otherwise we will have multiple 
+    //number of same devices everytime we allow permission
     selectors.forEach(select => {
         while (select.firstChild) {
             select.removeChild(select.firstChild);
         }
     });
+    // from the enumerated devices we need to add those values as options to each of the labels 
+    //this for loop performs the addition of the options after creation of the element
     for (let i = 0; i !== deviceInfos.length; ++i) {
         const deviceInfo = deviceInfos[i];
         const option = document.createElement('option');
@@ -30,18 +35,19 @@ function gotDevices(deviceInfos) {
         }
     }
     selectors.forEach((select, selectorIndex) => {
+        //setting value for each element in the list 
         if (Array.prototype.slice.call(select.childNodes).some(n => n.value === values[selectorIndex])) {
             select.value = values[selectorIndex];
         }
     });
 }
 
-navigator.mediaDevices.enumerateDevices().then(gotDevices).catch(handleError);
+//navigator.mediaDevices.enumerateDevices().then(gotDevices).catch(handleError);
 
 // Attach audio output device to video element using device/sink ID.
 function attachSinkId(element, sinkId) {
-    if (typeof element.sinkId !== 'undefined') {
-        element.setSinkId(sinkId)
+    if (typeof(element.sinkId) !== 'undefined') {
+        element.setSinkId(sinkId)//return string unique id of the output audio device
             .then(() => {
                 console.log(`Success, audio output device attached: ${sinkId}`);
             })
@@ -74,7 +80,7 @@ function start() {
             track.stop();
         });
     }
-    const audioSource = audioInputSelect.value;
+    const audioSource = audioInputSelect.value;//return device ID
     const videoSource = videoSelect.value;
     const constraints = {
         audio: { deviceId: audioSource ? { exact: audioSource } : undefined },
