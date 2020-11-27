@@ -17,7 +17,7 @@ function gotDevices(deviceInfos) {
     });
     // from the enumerated devices we need to add those values as options to each of the labels 
     //this for loop performs the addition of the options after creation of the element
-    for (let i = 0; i !== deviceInfos.length; ++i) {
+    for (let i = 0; i < deviceInfos.length; ++i) {
         const deviceInfo = deviceInfos[i];
         const option = document.createElement('option');
         option.value = deviceInfo.deviceId;
