@@ -1,4 +1,4 @@
-const webSocket = new WebSocket("ws://192.168.1.2:3000")
+const webSocket = new WebSocket("ws://127.0.0.1:3000")
 
 webSocket.onmessage = (event) => {
     handleSignallingData(JSON.parse(event.data))
@@ -48,13 +48,13 @@ function joinCall() {
         document.getElementById("local-video").srcObject = localStream
 
         let configuration = {
-            iceServers: [
+            /*iceServers: [
                 {
                     "urls": ["stun:stun.l.google.com:19302", 
                     "stun:stun1.l.google.com:19302", 
                     "stun:stun2.l.google.com:19302"]
                 }
-            ]
+            ]*/
         }
 
         peerConn = new RTCPeerConnection(configuration)

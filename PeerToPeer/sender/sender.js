@@ -1,6 +1,6 @@
-const webSocket = new WebSocket("ws://192.168.1.2:3000")
+const webSocket = new WebSocket("ws://127.0.0.1:3000"); //websocket object for a server at the url
 
-webSocket.onmessage = (event) => {
+webSocket.onmessage = (event) => {//listening at the url for messages from server
     handleSignallingData(JSON.parse(event.data))
 }
 
@@ -15,7 +15,7 @@ function handleSignallingData(data) {
 }
 
 function sendData(data) {
-    webSocket.send(JSON.stringify(data))
+    webSocket.send(JSON.stringify(data))//send data through web socket
 }
 
 
@@ -33,22 +33,21 @@ function startCall() {
         document.getElementById("local-video").srcObject = localStream
 
         let configuration = {
-            iceServers: [
+            /*iceServers: [
                 {
                     "urls": ["stun:stun.l.google.com:19302", 
                     "stun:stun1.l.google.com:19302", 
                     "stun:stun2.l.google.com:19302"]
                 }
-            ]
+            ]*/
         }
 
         peerConn = new RTCPeerConnection(configuration)
-        peerConn.addStream(localStream)
+        peerConn.addStream(localStream)//add local Stream to the local-video element
 
         peerConn.onaddstream = (e) => {
-            document.getElementById("remote-video")
-            .srcObject = e.stream
-        }
+            document.getElementById("remote-video").srcObject = e.stream
+        }//add remote Stream to the remote-video element after ICE candidate exchange
 
         peerConn.onicecandidate = ((e) => {
             if (e.candidate == null)

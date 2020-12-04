@@ -56,7 +56,6 @@ webSocket.on('request', (req) => {
                         candidate: candidate
                     }, connection)
                 })
-
                 break
         }
     })
