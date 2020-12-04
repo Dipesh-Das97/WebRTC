@@ -53,17 +53,40 @@ function start() {
 function restart() {
   restartButton.disabled = true;
   offerOptions.iceRestart = true;
-  pc1.createOffer(offerOptions).then(onCreateOfferSuccess);
+  /*pc1.oniceconnectionstatechange = function (evt) {
+    if (pc1.iceConnectionState === "failed") {
+      if (pc1.restartIce) {
+        pc1.restartIce();
+      } else {
+        pc1.createOffer({ iceRestart: true })
+          .then(onCreateOfferSuccess)
+          .then(onCreateAnswerSuccess);
+      //}
+    }
+  }*/
+  pc1.addEventListener("oniceconnectionstatechange", event => {
+    if (pc.iceConnectionState === "failed") {
+      if (pc1.restartIce) {
+        pc1.restartIce();
+      }
+    } else {
+      pc1.createOffer({iceRestart : true}).then(onCreateOfferSuccess).then(onCreateAnswerSuccess);
+    }
+  });
 }
 
 function call() {
   callButton.disabled = true;
   hangupButton.disabled = false;
   startTime = window.performance.now();
-
-  pc1 = window.pc1 = new RTCPeerConnection();
+  const configuration = {audio : true,
+  video :{
+    width : 320,
+    height : 240
+  }}
+  pc1 = window.pc1 = new RTCPeerConnection(configuration);
   pc1.onicecandidate = e => onIceCandidate(pc1, e);
-  pc2 = window.pc2 = new RTCPeerConnection();
+  pc2 = window.pc2 = new RTCPeerConnection(configuration);
   pc2.onicecandidate = e => onIceCandidate(pc2, e);
   pc1.oniceconnectionstatechange = e => {
     onIceStateChange(pc1, e);
@@ -73,8 +96,7 @@ function call() {
   };
   pc2.oniceconnectionstatechange = e => onIceStateChange(pc2, e);
   pc2.addEventListener('track', e => remoteVideo.srcObject = e.streams[0]);
-  localStream.getTracks().forEach(track => pc1.addTrack(track, localStream)
-  );
+  localStream.getTracks().forEach(track => pc1.addTrack(track, localStream));
   pc1.createOffer(offerOptions).then(onCreateOfferSuccess);
 }
 
@@ -99,34 +121,28 @@ function onIceStateChange(pc) {
   if (pc) {
     if (pc.iceConnectionState === 'connected' ||
       pc.iceConnectionState === 'completed') {
-      checkStats(pc);
+      checkStats();
     }
   }
 }
 
-function checkStats(pc) {
-  pc.getStats(null).then(results => {
-    // figure out the peer's ip
-    let activeCandidatePair = null;
-    let remoteCandidate = null;
-
-    // Search for the candidate pair, spec-way first.
-    results.forEach(report => {
-      if (report.type === 'transport') {
-        activeCandidatePair = results.get(report.selectedCandidatePairId);
+async function checkStats() {
+  const result = await pc1.getStats(null);
+  stats();
+  function stats() {
+    const s = [];
+    result.forEach(res => {
+      if (res.type === 'candidate-pair') {
+        s.push(res);
       }
     });
-    if (activeCandidatePair && activeCandidatePair.remoteCandidateId) {
-      results.forEach(report => {
-        if (report.type === 'remote-candidate' && report.id === activeCandidatePair.remoteCandidateId) {
-          remoteCandidate = report;
-        }
-      });
-    }
-    if (remoteCandidate && remoteCandidate.id) {
-      document.getElementById(pc === pc1 ? 'localCandidateId' : 'remoteCandidateId').textContent = remoteCandidate.id;
-    }
-  });
+    window.s = s;
+  }
+  const localCandidate = document.querySelector('#localCandidateId');
+  localCandidate.innerHTML += `<p>${s[0].localCandidateId}</p>`;
+
+  const remoteCandidate = document.querySelector('#remoteCandidateId');
+  remoteCandidate.innerHTML += `<p>${s[0].remoteCandidateId}</p>`;
 }
 
 function hangup() {
